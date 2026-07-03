@@ -14,7 +14,7 @@ if not os.path.exists(LOG_FILE):
         f.write("timestamp,user_id,username,first_name,action,text\n")
 
 # --- BOT TOKEN ---
-TOKEN = os.getenv("BOT_TOKEN")   # <-- now taken from environment
+TOKEN = os.getenv("BOT_TOKEN")   # <-- taken from Render environment
 BOT_USERNAME = "@your_bot_username_here"   # optional for group logic
 
 
@@ -62,7 +62,7 @@ async def asosiy_dars_topshirdim_command(update: Update, context: ContextTypes.D
 
 async def konspekt_qildim_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "Yozgan qo'llaringiz dard ko'rmasin! Bu qaydnomalar sizga uzoq yillar xizmat qiladi.Endi konspektingizni rasmga olib joylashtiring"
+        "Yozgan qo'llaringiz dard ko'rmasin! Bu qaydnomalar sizga uzoq yillar xizmat qiladi. Endi konspektingizni rasmga olib joylashtiring."
     )
     log_user_action(update, "Pressed /konspekt_qildim")
 
@@ -87,14 +87,13 @@ def handle_response(text: str) -> str:
         "allah rozi bo'lsin" in processed):
         return "Allah jumlamizdan rozi bo'lsin!"
     
-    # FIXED: lowercase matching
     if ("raxmat" in processed or
         "sog' bo'ling" in processed):
         return "JazakAllah Khayr! Sizga ham sog'liq va baraka tilayman!"
     
     if ("yaxshimiz?" in processed or
         "qalisiz" in processed):
-        return "Alhamdullilah, yaxshimiz. O'zingiz omonmisiz? Sizni sogliq va baraka bilan ko'rishdan xursandman!"
+        return "Alhamdullilah, yaxshimiz. O'zingiz omonmisiz? Sizni sog'liq va baraka bilan ko'rishdan xursandman!"
 
     return "Savolingizga tushunmadim. Guruhga murojat qiling."
 
@@ -106,7 +105,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     print(f"User({update.message.chat.id}) in {message_type}: '{text}'")
 
-    # FIXED: support both group types
     if message_type in ["group", "supergroup"]:
         if BOT_USERNAME in text:
             new_text = text.replace(BOT_USERNAME, "").strip()
@@ -130,7 +128,6 @@ async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
 if __name__ == "__main__":
     print("Botni boshlash...")
 
-    # FIXED: use TOKEN from environment
     app = ApplicationBuilder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("boshlamoq", boshlamoq_command))
@@ -139,7 +136,7 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("konspekt_qildim", konspekt_qildim_command))
     app.add_handler(CommandHandler("boshqa_savolim_bor", boshqa_savolim_bor_command))
 
-    app.add_handler(MessageHandler(filters.TEXT, handle_message))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     app.add_error_handler(error)
 
