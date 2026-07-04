@@ -1,7 +1,0 @@
-python-telegram-bot==20.7
-aiohttp
-python-dotenv
-requests
-pytz
-tzdata
-typing-extensions
